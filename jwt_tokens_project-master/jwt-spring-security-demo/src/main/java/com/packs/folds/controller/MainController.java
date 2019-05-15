@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicLong;
 @RestController
 public class MainController {
 
-    private static final String template = "%s!";
+    private static final String template = ", %s!";
     private final AtomicLong counter = new AtomicLong();
 
 
