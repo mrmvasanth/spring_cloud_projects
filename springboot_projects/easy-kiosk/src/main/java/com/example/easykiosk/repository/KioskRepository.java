@@ -11,5 +11,6 @@ import java.util.Collection;
 @Repository
 public interface KioskRepository extends JpaRepository<UserDetails, Long>  {
 
+    @Query(value = "SELECT * FROM user_details u WHERE u.username= ?1 ", nativeQuery = true)
     public UserDetails findByUsername(String username);
 }
