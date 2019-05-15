@@ -22,7 +22,7 @@ import java.util.Optional;
 @RequestMapping("/api")
 public class KioskController {
 
-    @Autowired
+
     KioskRepository kioskRepository;
 
     BCryptUtils bCryptUtils=new BCryptUtils();
@@ -56,11 +56,21 @@ public class KioskController {
     }
 
     @PostMapping("/login")
-    public void login(@Valid @RequestBody RequestModel requestModel) {
-        Optional<UserDetails> user = kioskRepository.findById(requestModel.getId());
-        System.out.println(user.toString());
+    public UserDetails getuserbyusername(@Valid @RequestBody RequestModel requestModel){
+        String originalPassword,encryptedPassword;
+        Boolean checkPassword;
+        originalPassword=requestModel.getPassword();
+        UserDetails userDetails=kioskRepository.findByUsername(requestModel.getUsername());
+        encryptedPassword=userDetails.getPassword();
 
-
+        checkPassword=bCryptUtils.decodePassword(originalPassword,encryptedPassword);
+        if(checkPassword){
+            userDetails.setImageurl("file:///home/administrator/Pictures/"+userDetails.getImageurl());
+            return userDetails;
+        }
+        else {
+            return null;
+        }
 
 
     }
