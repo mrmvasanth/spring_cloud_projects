@@ -1,6 +1,5 @@
 package com.packs.TrackingSystemPOC.services;
 
-import com.packs.TrackingSystemPOC.constants.StatusEnum;
 import com.packs.TrackingSystemPOC.entity.Orders;
 import com.packs.TrackingSystemPOC.repositories.OrdersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,14 +14,14 @@ public class OrdersService {
     @Autowired
     OrdersRepository ordersRepository;
 
-    public void placeOrder(Orders order) {
-        StatusEnum status=StatusEnum.valueOf(order.getStatus());
-        order.setStatus(status.getStatus());
+    public Orders placeOrder(Orders order) {
         ordersRepository.save(order);
+        return order;
     }
 
-    public void deleteOrderById(int orderId) {
+    public int deleteOrderById(int orderId) {
         ordersRepository.deleteById(orderId);
+        return orderId;
     }
 
     public List<Orders> getAllOrders() {
@@ -38,9 +37,7 @@ public class OrdersService {
     }
 
     public List<Orders> getOrderByStatus(String statusCode) {
-        StatusEnum status=StatusEnum.valueOf(statusCode);
-        String stat=status.getStatus();
-        return ordersRepository.findOrdersByStatus(stat);
+        return ordersRepository.findOrdersByStatus(statusCode);
     }
 
 }

@@ -14,20 +14,21 @@ public class UsersService {
     @Autowired
     UsersRepository usersRepository;
 
-    public Users addUser(Users user){
+    public Users addUser(Users user) {
         usersRepository.save(user);
         return user;
     }
 
-    public List<Users> getAllUsers(){
+    public List<Users> getAllUsers() {
         return (List<Users>) usersRepository.findAll();
     }
 
-    public Optional<Users> getUser(int userId){
+    public Optional<Users> getUser(int userId) {
         return usersRepository.findById(userId);
     }
 
-    public void deleteUser(int userId){
+    public int deleteUser(int userId) {
         usersRepository.deleteById(userId);
+        return userId;
     }
 }

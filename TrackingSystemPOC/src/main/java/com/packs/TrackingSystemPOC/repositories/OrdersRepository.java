@@ -13,7 +13,4 @@ public interface OrdersRepository extends JpaRepository<Orders,Integer> {
 
      List<Orders> findOrdersByStatus(String status);
 
-
-
-
 }

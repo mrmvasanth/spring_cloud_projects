@@ -1,5 +1,7 @@
 package com.packs.TrackingSystemPOC.entity;
 
+import com.packs.TrackingSystemPOC.constants.StatusEnum;
+
 import javax.persistence.*;
 
 @Entity
@@ -13,7 +15,8 @@ public class Orders {
 
     private String itemName;
 
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private StatusEnum status;
 
     public int getOrderId() {
         return orderId;
@@ -39,11 +42,11 @@ public class Orders {
         this.itemName = itemName;
     }
 
-    public String getStatus() {
+    public StatusEnum getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(StatusEnum status) {
         this.status = status;
     }
 }
