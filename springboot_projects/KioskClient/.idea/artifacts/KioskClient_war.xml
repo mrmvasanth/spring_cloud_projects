@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="war" name="KioskClient:war">
-    <output-path>$PROJECT_DIR$/out/artifacts/KioskClient_war</output-path>
-    <root id="archive" name="KioskClient_war.war">
-      <element id="artifact" artifact-name="KioskClient:war exploded" />
-    </root>
-  </artifact>
-</component>

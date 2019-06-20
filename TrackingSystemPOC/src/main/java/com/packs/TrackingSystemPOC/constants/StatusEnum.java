@@ -1,30 +1,21 @@
 package com.packs.TrackingSystemPOC.constants;
 
-public enum StatusEnum {
-    AC("Added to Wish Cart"),
+public enum StatusEnum
+{
     AW("Added to Wish List"),
+    AC("Added to Wish Cart"),
     AA("Address Added"),
     OS("Order Summary"),
     PP("Payment Processed"),
     OP("Order Placed");
 
-    private String code;
+    private String status;
 
-    StatusEnum(String code) {
-        this.code = code;
+    StatusEnum(String selectedstatus) {
+        this.status = selectedstatus;
     }
 
-    public String getCode() {
-        return code;
-    }
-
-    public static StatusEnum fromCode(String code) {
-        for (StatusEnum status :StatusEnum.values()){
-            if (status.getCode().equals(code)){
-                return status;
-            }
-        }
-        throw new UnsupportedOperationException(
-                "The code " + code + " is not supported!");
+    public String getStatus() {
+        return status;
     }
 }

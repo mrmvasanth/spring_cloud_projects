@@ -1,4 +1,5 @@
 package com.packs.folds.security.model;
+
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
 public class JwtAuthenticationToken extends UsernamePasswordAuthenticationToken {

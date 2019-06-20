@@ -1,6 +1,5 @@
 package com.packs.TrackingSystemPOC.repositories;
 
-import com.packs.TrackingSystemPOC.constants.StatusEnum;
 import com.packs.TrackingSystemPOC.entity.Orders;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -12,6 +11,9 @@ public interface OrdersRepository extends JpaRepository<Orders,Integer> {
 
      List<Orders> findOrdersByUserId(int userId);
 
-     List<Orders> findOrdersByStatus(StatusEnum status);
+     List<Orders> findOrdersByStatus(String status);
+
+
+
 
 }

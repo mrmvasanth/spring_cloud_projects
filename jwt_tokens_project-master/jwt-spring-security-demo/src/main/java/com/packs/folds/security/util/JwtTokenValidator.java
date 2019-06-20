@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 public class JwtTokenValidator {
 
 
-
     @Value("${jwt.secret}")
     private String secret;
 
