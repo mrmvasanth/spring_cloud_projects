@@ -10,6 +10,5 @@ public class HelloWebClientServiceMain {
 
 	public static void main(String[] args) {
 		SpringApplication.run(HelloWebClientServiceMain.class, args);
-		System.out.println("Running");
 	}
 }
