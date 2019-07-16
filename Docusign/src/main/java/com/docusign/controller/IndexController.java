@@ -8,18 +8,18 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class IndexController {
-    @RequestMapping(path = "/",method = RequestMethod.GET)
+    @RequestMapping(path = "/", method = RequestMethod.GET)
     public String index(ModelMap model) {
-        model.addAttribute("title","Home");
+        model.addAttribute("title", "Home");
         return "pages/index";
     }
 
-    @RequestMapping(path = "/ds-return",method = RequestMethod.GET)
-    public String returnController(@RequestParam(value="state", required = false) String state,
-                                   @RequestParam(value="event", required = false) String event,
-                                   @RequestParam(value="envelopeId", required = false) String envelopeId,
+    @RequestMapping(path = "/ds-return", method = RequestMethod.GET)
+    public String returnController(@RequestParam(value = "state", required = false) String state,
+                                   @RequestParam(value = "event", required = false) String event,
+                                   @RequestParam(value = "envelopeId", required = false) String envelopeId,
                                    ModelMap model) {
-        model.addAttribute("title" , "Return from DocuSign");
+        model.addAttribute("title", "Return from DocuSign");
         model.addAttribute("event", event);
         model.addAttribute("state", state);
         model.addAttribute("qpEnvelopeId", envelopeId);

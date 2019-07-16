@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -128,7 +129,7 @@ public class QS02SendEnvelopeController {
     // Handle get request to show the form
     @RequestMapping(path = "/qs02", method = RequestMethod.GET)
     public String get(ModelMap model) {
-        model.addAttribute("title","Signing Request by Email");
+        model.addAttribute("title", "Signing Request by Email");
         return "pages/qs02";
     }
 }

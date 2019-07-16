@@ -11,6 +11,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.joda.time.LocalDate;
+
 import java.io.IOException;
 
 import static com.docusign.configurations.configConstants.*;
@@ -20,7 +21,7 @@ public class QS03ListEnvelopesController {
 
     @RequestMapping(path = "/qs03", method = RequestMethod.POST)
     public Object create(ModelMap model) throws ApiException, IOException {
-        model.addAttribute("title","Embedded Signing Ceremony");
+        model.addAttribute("title", "Embedded Signing Ceremony");
 
         // Data for this example
         // Fill in these constants
@@ -59,7 +60,7 @@ public class QS03ListEnvelopesController {
     // Handle get request to show the form
     @RequestMapping(path = "/qs03", method = RequestMethod.GET)
     public String get(ModelMap model) {
-        model.addAttribute("title","List Updated Envelopes");
+        model.addAttribute("title", "List Updated Envelopes");
         return "pages/qs03";
     }
 }

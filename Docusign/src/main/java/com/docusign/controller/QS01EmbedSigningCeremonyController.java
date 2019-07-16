@@ -10,6 +10,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.view.RedirectView;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,7 +23,7 @@ public class QS01EmbedSigningCeremonyController {
 
     @RequestMapping(path = "/qs01", method = RequestMethod.POST)
     public Object create(ModelMap model) throws ApiException, IOException {
-        model.addAttribute("title","Embedded Signing Ceremony");
+        model.addAttribute("title", "Embedded Signing Ceremony");
 
         // Data for this example
         // Fill in these constants
@@ -35,7 +36,6 @@ public class QS01EmbedSigningCeremonyController {
         // Recipient Information
         String signerName = SIGNER_NAME;
         String signerEmail = SIGNER_EMAIL;
-
         // The url for this web application
         String baseUrl = "http://localhost:8080";
         String clientUserId = "123"; // Used to indicate that the signer will use an embedded
@@ -141,10 +141,10 @@ public class QS01EmbedSigningCeremonyController {
     }
 
 
-//     Handle get request to show the form
+    //     Handle get request to show the form
     @RequestMapping(path = "/qs01", method = RequestMethod.GET)
     public String get(ModelMap model) {
-        model.addAttribute("title","Embedded Signing Ceremony");
+        model.addAttribute("title", "Embedded Signing Ceremony");
         return "pages/qs01";
 
     }
