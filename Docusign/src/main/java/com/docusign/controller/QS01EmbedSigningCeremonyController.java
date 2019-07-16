@@ -141,10 +141,13 @@ public class QS01EmbedSigningCeremonyController {
     }
 
 
-    // Handle get request to show the form
+//     Handle get request to show the form
     @RequestMapping(path = "/qs01", method = RequestMethod.GET)
     public String get(ModelMap model) {
         model.addAttribute("title","Embedded Signing Ceremony");
         return "pages/qs01";
+
     }
+
+
 }
