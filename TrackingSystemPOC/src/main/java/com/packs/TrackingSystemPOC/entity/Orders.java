@@ -5,7 +5,7 @@ import com.packs.TrackingSystemPOC.constants.StatusEnum;
 import javax.persistence.*;
 
 @Entity
-@Table(name="orders")
+@Table(name = "orders")
 public class Orders {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

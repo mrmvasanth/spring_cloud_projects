@@ -28,10 +28,10 @@ public class TrackerResponseEntity<T> {
         this.data = data;
     }
 
-    public TrackerResponseEntity(int code,HttpStatus httpStatus,String message){
-        this.code=code;
-        this.httpStatus=httpStatus;
-        this.message=message;
+    public TrackerResponseEntity(int code, HttpStatus httpStatus, String message) {
+        this.code = code;
+        this.httpStatus = httpStatus;
+        this.message = message;
     }
 
     public TrackerResponseEntity message(String message) {
@@ -47,8 +47,8 @@ public class TrackerResponseEntity<T> {
         return new TrackerResponseEntity(httpStatus, code, data);
     }
 
-    public static <T> TrackerResponseEntity make(int code,HttpStatus httpStatus, String message) {
-        return new TrackerResponseEntity(code,httpStatus, message);
+    public static <T> TrackerResponseEntity make(int code, HttpStatus httpStatus, String message) {
+        return new TrackerResponseEntity(code, httpStatus, message);
     }
 
 }

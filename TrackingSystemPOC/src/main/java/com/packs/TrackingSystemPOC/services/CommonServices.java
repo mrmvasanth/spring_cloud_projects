@@ -29,29 +29,29 @@ public class CommonServices {
 
     List<Object> responseData;
 
-    public TrackerResponseEntity getUserInfo(int userId){
+    public TrackerResponseEntity getUserInfo(int userId) {
         List<Object> res = null;
         res.add(usersRepository.findById(userId));
         res.add(ordersRepository.findOrdersByUserId(userId));
-        TrackerResponseEntity trackerResponseEntity=new TrackerResponseEntity(res);
+        TrackerResponseEntity trackerResponseEntity = new TrackerResponseEntity(res);
         return trackerResponseEntity;
     }
 
     public TrackerResponseEntity getOrderByOrderId(int orderId) {
-        Optional<Orders> orders=ordersRepository.findById(orderId);
-        TrackerResponseEntity trackerResponseEntity=new TrackerResponseEntity(orders);
+        Optional<Orders> orders = ordersRepository.findById(orderId);
+        TrackerResponseEntity trackerResponseEntity = new TrackerResponseEntity(orders);
         return trackerResponseEntity;
     }
 
     public TrackerResponseEntity getOrdersByUserId(int userId) {
-            List<Orders> orders=ordersRepository.findOrdersByUserId(userId);
-            TrackerResponseEntity trackerResponseEntity=new TrackerResponseEntity(orders);
+        List<Orders> orders = ordersRepository.findOrdersByUserId(userId);
+        TrackerResponseEntity trackerResponseEntity = new TrackerResponseEntity(orders);
         return trackerResponseEntity;
     }
 
     public TrackerResponseEntity getOrderByStatus(StatusEnum statusEnum) {
-        List<Orders> orders=ordersRepository.findOrdersByStatus(statusEnum);
-        TrackerResponseEntity trackerResponseEntity=new TrackerResponseEntity(orders);
+        List<Orders> orders = ordersRepository.findOrdersByStatus(statusEnum);
+        TrackerResponseEntity trackerResponseEntity = new TrackerResponseEntity(orders);
         return trackerResponseEntity;
     }
 }

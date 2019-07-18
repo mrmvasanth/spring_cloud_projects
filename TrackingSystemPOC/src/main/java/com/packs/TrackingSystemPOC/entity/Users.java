@@ -4,7 +4,7 @@ package com.packs.TrackingSystemPOC.entity;
 import javax.persistence.*;
 
 @Entity
-@Table(name="users")
+@Table(name = "users")
 public class Users {
 
     @Id

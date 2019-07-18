@@ -32,12 +32,12 @@ public class HomeController {
     }
 
     @GetMapping("/getuser/{userid}")
-    private Optional<Users> getuser(@PathVariable("userid") int userId){
+    private Optional<Users> getuser(@PathVariable("userid") int userId) {
         return usersService.getUser(userId);
     }
 
     @DeleteMapping("/deleteuser/{userid}")
-    public void deleteUser(@PathVariable("userid") int userId ) {
+    public void deleteUser(@PathVariable("userid") int userId) {
         usersService.deleteUser(userId);
     }
 

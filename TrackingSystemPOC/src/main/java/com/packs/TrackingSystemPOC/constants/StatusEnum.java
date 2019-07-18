@@ -19,8 +19,8 @@ public enum StatusEnum {
     }
 
     public static StatusEnum fromCode(String code) {
-        for (StatusEnum status :StatusEnum.values()){
-            if (status.getCode().equals(code)){
+        for (StatusEnum status : StatusEnum.values()) {
+            if (status.getCode().equals(code)) {
                 return status;
             }
         }
