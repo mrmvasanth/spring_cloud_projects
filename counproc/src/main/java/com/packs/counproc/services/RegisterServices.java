@@ -133,7 +133,6 @@ public class RegisterServices {
             studentCollegeMap.setStudentId(student.get(0).getId());
             studentCollegeRepo.save(studentCollegeMap);
             student.get(0).setAssigned(true);
-            // update counselling status in register student table
             registerStudentRepo.save(student.get(0));
             return new ApiResponse(200, "Student enrolled Successfully");
         } catch (Exception e) {

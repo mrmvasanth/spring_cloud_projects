@@ -14,6 +14,4 @@ public interface RegisterStudentRepo extends MongoRepository<RegisterStudent,Int
     //db.registerStudent.find({called:false}).limit(2);
     List<RegisterStudent> findByCalled(boolean called, Sort sort);
     List<RegisterStudent> findByRegId(String regId);
-
-
 }

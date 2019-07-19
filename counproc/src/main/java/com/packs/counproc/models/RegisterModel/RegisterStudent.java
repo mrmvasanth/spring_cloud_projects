@@ -21,6 +21,7 @@ public class RegisterStudent {
     @Id
     String id;
 
+
     String regId;
     String studentName;
     String schoolName;
