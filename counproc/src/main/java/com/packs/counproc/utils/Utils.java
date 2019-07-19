@@ -37,7 +37,7 @@ public class Utils {
         return sb.toString();
     }
 
-    public boolean validateStudent(ChooseCollege chooseCollege) {
+    public boolean validateStudent(ChooseCollege chooseCollege                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  ) {
         List<RegisterStudent> student = registerStudentRepo.findByRegId(chooseCollege.getRegId());
         if (!student.isEmpty()) {
             if (student.get(0).getRegId().equals(chooseCollege.getRegId()) &&
