@@ -27,6 +27,9 @@ public class ApiResponse<T> {
         this.code = code;
     }
 
+    public ApiResponse() {
+    }
+
     //Static constructor methods
     public static <T> ApiResponse make(int code, HttpStatus httpStatus, String message) {
         return new ApiResponse(code, httpStatus, message);

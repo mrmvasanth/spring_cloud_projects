@@ -3,6 +3,7 @@ package com.packs.counproc.models.RegisterModel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.joda.time.DateTime;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -19,13 +20,19 @@ public class RegisterStudent {
 
     @Id
     String id;
+
+    String regId;
     String studentName;
     String schoolName;
     int marksPercentage;
     @Email @NotBlank @NotNull
     String email;
-    Date registeredOn;
+    String counsellingCode;
+    String counsellingDate;
     boolean called;
+    boolean assigned;
+    Date registeredOn;
+
 
 
 }

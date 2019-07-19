@@ -1,13 +1,14 @@
 package com.packs.counproc.controllers;
 
 import com.packs.counproc.models.RegisterModel.RegisterStudent;
+import com.packs.counproc.models.requests.ChooseCollege;
 import com.packs.counproc.models.responses.ApiResponse;
 import com.packs.counproc.services.RegisterServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/reg")
+@RequestMapping("/api/co")
 public class CounsellingController {
 
     @Autowired
@@ -31,6 +32,11 @@ public class CounsellingController {
     @GetMapping("/sendcalls")
     public ApiResponse sendEmails() {
         return registerService.sendEmails();
+    }
+
+    @PostMapping("/choosecollege")
+    public ApiResponse chooseCollege(@RequestBody ChooseCollege chooseCollege){
+        return registerService.chooseCollege(chooseCollege);
     }
 
 }

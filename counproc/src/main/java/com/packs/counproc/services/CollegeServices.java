@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class CollegeServices {
 
@@ -33,10 +35,10 @@ public class CollegeServices {
     }
 
     public ApiResponse addDepartment(AddDepartment addDepartment) {
-        Colleges colleges = collegesRepo.findByCollegeName(addDepartment.getCollegeName());
-        if (!(colleges == null)) {
+        List<Colleges> colleges = collegesRepo.findByCollegeName(addDepartment.getCollegeName());
+        if (!colleges.isEmpty()) {
             DepartmentList department = new DepartmentList();
-            department.setCollegeId(colleges.getId());
+            department.setCollegeId(colleges.get(0).getId());
             department.setDeptName(addDepartment.getDepartmentName());
             department.setDeptDesc(addDepartment.getDescription());
             department.setInTakeCount(addDepartment.getInTakeCount());
