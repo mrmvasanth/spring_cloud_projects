@@ -1,19 +1,14 @@
 package com.packs.counproc.services;
 
 import com.packs.counproc.models.RegisterModel.RegisterStudent;
-import com.packs.counproc.repositories.RegisterStudentRepo;
+import com.packs.counproc.repositories.register.RegisterStudentRepo;
 import com.packs.counproc.utils.Utils;
 import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 @Service

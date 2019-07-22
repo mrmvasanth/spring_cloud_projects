@@ -12,5 +12,8 @@ public class Colleges {
     @Id
     String id;
 
+    int collegeId;
+
     String collegeName;
+
 }

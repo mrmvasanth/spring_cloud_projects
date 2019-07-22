@@ -9,7 +9,7 @@ import lombok.ToString;
 @ToString
 public class ChooseCollege {
 
-    String regId;
+    int regId;
     String collegeName;
     String deptName;
     String counsellingCode;

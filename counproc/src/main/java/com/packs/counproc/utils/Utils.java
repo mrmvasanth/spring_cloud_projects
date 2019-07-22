@@ -1,20 +1,16 @@
 package com.packs.counproc.utils;
 
-import com.packs.counproc.models.CustomSequences;
+
+import com.packs.counproc.models.DatabaseSequence;
 import com.packs.counproc.models.RegisterModel.RegisterStudent;
 import com.packs.counproc.models.requests.ChooseCollege;
-import com.packs.counproc.repositories.RegisterStudentRepo;
+import com.packs.counproc.repositories.DatabaseSequenceRepo;
+import com.packs.counproc.repositories.register.RegisterStudentRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
-import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
-import org.springframework.data.mongodb.core.MongoOperations;
-import org.springframework.data.mongodb.core.query.Update;
-import java.util.List;
 
-import static org.springframework.data.mongodb.core.FindAndModifyOptions.options;
-import static org.springframework.data.mongodb.core.query.Criteria.where;
-import static org.springframework.data.mongodb.core.query.Query.query;
+import java.util.List;
 
 @Service
 public class Utils {
@@ -25,18 +21,19 @@ public class Utils {
     @Autowired
     RegisterStudentRepo registerStudentRepo;
 
+    @Autowired
+    DatabaseSequenceRepo databaseSequenceRepo;
+
     String alphaNumericString = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     String numerics = "0123456789";
 
 
-    public int getNextSequence(String seqName)
-    {
-        CustomSequences counter = mongo.findAndModify(
-                query(where("_id").is(seqName)),
-                new Update().inc("seq",1),
-                options().returnNew(true).upsert(true),
-                CustomSequences.class);
-        return counter.getSeq();
+    public int getIncCount(String modelName){
+        DatabaseSequence  currentSequence=databaseSequenceRepo.findByModelName(modelName);
+        int count=currentSequence.getSeq();
+        currentSequence.setSeq(++count);
+        databaseSequenceRepo.save(currentSequence);
+        return currentSequence.getSeq();
     }
 
     public String getRandomCode(String code) {
@@ -62,7 +59,7 @@ public class Utils {
     public boolean validateStudent(ChooseCollege chooseCollege                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  ) {
         List<RegisterStudent> student = registerStudentRepo.findByRegId(chooseCollege.getRegId());
         if (!student.isEmpty()) {
-            if (student.get(0).getRegId().equals(chooseCollege.getRegId()) &&
+            if (student.get(0).getRegId()==(chooseCollege.getRegId()) &&
                     student.get(0).getCounsellingCode().equals(chooseCollege.getCounsellingCode()) &&
                     !student.get(0).isAssigned())
                 return true;

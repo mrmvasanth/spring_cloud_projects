@@ -8,18 +8,20 @@ import org.springframework.data.annotation.Id;
 @Getter
 @Setter
 @ToString
-public class DepartmentList {
+public class Classrooms {
+
     @Id
     String id;
 
-    int deptId;
-
     int collegeId;
+
+    int deptId;
 
     String deptName;
 
-    String deptDesc;
+    int sectionId;
 
-    int inTakeCount;
+    String sectionName;
 
+    int totalStudents;
 }

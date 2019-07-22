@@ -4,22 +4,25 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 
 @Getter
 @Setter
 @ToString
-public class DepartmentList {
+public class StudentClassMap {
+
     @Id
     String id;
 
-    int deptId;
+    int collegId;
 
-    int collegeId;
+    int deptId;
 
     String deptName;
 
-    String deptDesc;
+    int sectionId;
 
-    int inTakeCount;
+    String sectionName;
 
+    int studentId;
 }

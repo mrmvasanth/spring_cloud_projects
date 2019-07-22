@@ -10,11 +10,16 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Getter
 @Setter
 @ToString
-@Document(collection = "customSequences")
-public class CustomSequences {
+@Document(collection = "DatabaseSequence")
+public class DatabaseSequence {
+
     @Id
     private String id;
+
+    private  String modelName;
+
     private int seq;
 
-
 }
+
+

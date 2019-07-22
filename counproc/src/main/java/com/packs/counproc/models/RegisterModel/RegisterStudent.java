@@ -21,8 +21,8 @@ public class RegisterStudent {
     @Id
     String id;
 
+    int regId;
 
-    String regId;
     String studentName;
     String schoolName;
     int marksPercentage;

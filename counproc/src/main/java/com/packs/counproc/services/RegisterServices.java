@@ -7,14 +7,12 @@ import com.packs.counproc.models.RegisterModel.StudentCollegeMap;
 import com.packs.counproc.models.requests.ChooseCollege;
 import com.packs.counproc.models.responses.ApiResponse;
 import com.packs.counproc.models.responses.AvailableColleges;
-import com.packs.counproc.repositories.CollegesRepo;
-import com.packs.counproc.repositories.DepartmentListRepo;
-import com.packs.counproc.repositories.RegisterStudentRepo;
-import com.packs.counproc.repositories.StudentCollegeRepo;
+import com.packs.counproc.repositories.college.CollegesRepo;
+import com.packs.counproc.repositories.college.DepartmentListRepo;
+import com.packs.counproc.repositories.register.RegisterStudentRepo;
+import com.packs.counproc.repositories.register.StudentCollegeRepo;
 import com.packs.counproc.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -52,7 +50,7 @@ public class RegisterServices {
     public ApiResponse resgisterStudent(RegisterStudent student) {
         student.setRegisteredOn(new Date());
         student.setCalled(false);
-        student.setRegId(utils.getRandomCode("RID"));
+        student.setRegId(utils.getIncCount("RegisterId"));
         registerStudentRepo.save(student);
         String response = "Your registration ID is: " + student.getRegId();
         return new ApiResponse(200, HttpStatus.OK, response, "Registration Success");
@@ -95,7 +93,7 @@ public class RegisterServices {
         boolean enrolledStatus = false;
         List<Colleges> colleges = collegesRepo.findByCollegeName(chooseCollege.getCollegeName());
         if (!colleges.isEmpty()) {
-            List<DepartmentList> departmentList = departmentListRepo.findByCollegeId(colleges.get(0).getId());
+            List<DepartmentList> departmentList = departmentListRepo.findByCollegeId(colleges.get(0).getCollegeId());
             for (DepartmentList departments : departmentList) {
                 if (departments.getInTakeCount() > 0 && departments.getDeptName().equals(chooseCollege.getDeptName())) {
                     // enroll the student to the college and dept
@@ -103,11 +101,14 @@ public class RegisterServices {
                     break;
                 } else {
                     if (departments.getInTakeCount() > 0){
-                        Colleges collegeObj=collegesRepo.findById(departments.getCollegeId());
+                        Colleges collegeObj=collegesRepo.findByCollegeId(departments.getCollegeId());
+
                         AvailableColleges college=new AvailableColleges();
+
                         college.setAvailableSeats(departments.getInTakeCount());
                         college.setDepartmentName(departments.getDeptName());
                         college.setCollegeName(collegeObj.getCollegeName());
+
                         availableCollegesList.add(college);
                     }
                     // get list of available departments
@@ -116,7 +117,7 @@ public class RegisterServices {
             }
             return apiResponse;
         } else {
-            return new ApiResponse(400, HttpStatus.BAD_REQUEST, "Invalid Reg Id");
+            return new ApiResponse(400, HttpStatus.BAD_REQUEST, "Invalid College");
         }
     }
 
@@ -129,8 +130,8 @@ public class RegisterServices {
             // add to studentCollegeMap table
             StudentCollegeMap studentCollegeMap = new StudentCollegeMap();
             studentCollegeMap.setCollegeId(department.getCollegeId());
-            studentCollegeMap.setDepartmentId(department.getId());
-            studentCollegeMap.setStudentId(student.get(0).getId());
+            studentCollegeMap.setDepartmentId(department.getDeptId());
+            studentCollegeMap.setStudentId(student.get(0).getRegId());
             studentCollegeRepo.save(studentCollegeMap);
             student.get(0).setAssigned(true);
             registerStudentRepo.save(student.get(0));
