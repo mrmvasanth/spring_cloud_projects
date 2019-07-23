@@ -1,17 +1,13 @@
 package com.packs.counproc.services;
 
-import com.packs.counproc.models.CollegeModels.Classrooms;
-import com.packs.counproc.models.CollegeModels.Colleges;
-import com.packs.counproc.models.CollegeModels.DepartmentList;
-import com.packs.counproc.models.CollegeModels.StudentClassMap;
+import com.packs.counproc.models.CollegeModels.*;
+import com.packs.counproc.models.RegisterModel.RegisterStudent;
 import com.packs.counproc.models.RegisterModel.StudentCollegeMap;
 import com.packs.counproc.models.requests.AddDepartment;
 import com.packs.counproc.models.responses.ApiResponse;
 import com.packs.counproc.repositories.*;
-import com.packs.counproc.repositories.college.ClassroomRepo;
-import com.packs.counproc.repositories.college.CollegesRepo;
-import com.packs.counproc.repositories.college.DepartmentListRepo;
-import com.packs.counproc.repositories.college.StudentClassRepo;
+import com.packs.counproc.repositories.college.*;
+import com.packs.counproc.repositories.register.RegisterStudentRepo;
 import com.packs.counproc.repositories.register.StudentCollegeRepo;
 import com.packs.counproc.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CollegeServices {
@@ -42,9 +39,15 @@ public class CollegeServices {
     StudentClassRepo studentClassRepo;
 
     @Autowired
+    ClassStatsRepo classStatsRepo;
+
+    @Autowired
+    RegisterStudentRepo registerStudentRepo;
+
+    @Autowired
     Utils utils;
 
-    public ApiResponse getAllColleges(){
+    public ApiResponse getAllColleges() {
         return new ApiResponse(200, HttpStatus.OK, collegesRepo.findAll(), "All Colleges");
     }
 
@@ -54,8 +57,8 @@ public class CollegeServices {
         return new ApiResponse(200, HttpStatus.OK, collegeObj.getCollegeId(), "College Added");
     }
 
-    public ApiResponse getAllDepartment(){
-        return new ApiResponse(200,HttpStatus.OK,departmentListRepo.findAll(),"All Departments");
+    public ApiResponse getAllDepartment() {
+        return new ApiResponse(200, HttpStatus.OK, departmentListRepo.findAll(), "All Departments");
     }
 
     public ApiResponse addDepartment(AddDepartment addDepartment) {
@@ -69,68 +72,141 @@ public class CollegeServices {
             department.setDeptId(utils.getIncCount("DepartmentList"));
             departmentListRepo.save(department);
             return new ApiResponse(200, HttpStatus.OK, "Department Added");
-        }else{
+        } else {
             return new ApiResponse(404, HttpStatus.NOT_FOUND, "Invalid college");
         }
 
     }
 
-    public ApiResponse addClassroom(int collegeId, Classrooms addClassroom){
-        List<DepartmentList> deptList=departmentListRepo.findByDeptName(addClassroom.getDeptName());
-        if (!deptList.isEmpty()){
-            for (DepartmentList department:deptList) {
-                if(department.getCollegeId()==collegeId){
+    public ApiResponse addClassroom(int collegeId, Classrooms addClassroom) {
+        List<DepartmentList> deptList = departmentListRepo.findByDeptName(addClassroom.getDeptName());
+        if (!deptList.isEmpty()) {
+            for (DepartmentList department : deptList) {
+                if (department.getCollegeId() == collegeId) {
+
                     addClassroom.setCollegeId(collegeId);
                     addClassroom.setDeptId(deptList.get(0).getDeptId());
                     addClassroom.setSectionId(utils.getIncCount("ClassRoomId"));
                     classroomRepo.save(addClassroom);
+
+                    ClassStats classStats = new ClassStats();
+                    classStats.setSectionId(addClassroom.getSectionId());
+                    classStats.setGroupOneCount(0);
+                    classStats.setGroupTwoCount(0);
+                    classStats.setGroupThreeCount(0);
+                    classStatsRepo.save(classStats);
                     return new ApiResponse(200, HttpStatus.OK, "Classrooms Added");
                 }
             }
             return new ApiResponse(404, HttpStatus.NOT_FOUND, "Invalid College ID");
-        }else
+        } else
             return new ApiResponse(404, HttpStatus.NOT_FOUND, "Invalid Department Name");
     }
 
-    public ApiResponse getAllClassrooms(int collegeId){
+    public ApiResponse getAllClassrooms(int collegeId) {
         return new ApiResponse(200, HttpStatus.OK,
-                classroomRepo.findByCollegeId(collegeId),"All Classrooms");
+                classroomRepo.findByCollegeId(collegeId), "All Classrooms");
     }
 
-    public ApiResponse assignclasses(int collegeId){
-        // get students by college id
-        List<StudentCollegeMap> studentsList=studentCollegeRepo.findByCollegeId(collegeId);
-        for (StudentCollegeMap student:studentsList) {
-            List<Classrooms> classrooms=classroomRepo.findByCollegeIdAndDeptId(collegeId,student.getDepartmentId());
-            for(Classrooms classroom:classrooms){
-                if(classroom.getTotalStudents()>0){
-                    assignClassroom(classroom,student);
+
+    public ApiResponse addClassStats(ClassStats classStats) {
+        classStatsRepo.save(classStats);
+        return new ApiResponse(200, HttpStatus.OK, "ClassStats Added");
+    }
+
+    public ApiResponse getClassStats() {
+        return new ApiResponse(200, HttpStatus.OK, classStatsRepo.findAll(), "All ClassStats ");
+    }
+
+    public ApiResponse getStudentClassMap() {
+        return new ApiResponse(200, HttpStatus.OK, studentClassRepo.findAll(), "StudentClassMap");
+    }
+
+    public ApiResponse assignclasses(int collegeId) {
+        boolean flag = false;
+        // get all classrooms in the college
+        List<Classrooms> classroomsInCollege = classroomRepo.findByCollegeId(collegeId);
+        // get all student registered to the particular college
+        List<StudentCollegeMap> studentsInCollege = studentCollegeRepo.findByCollegeId(collegeId);
+        for (StudentCollegeMap student : studentsInCollege) {
+            // find the group to which the student belong to
+            int studentGroup = getStudentGroup(student);
+            List<Classrooms> matchedClassroomList = classroomsInCollege.stream()
+                    .filter(classroom -> classroom.getDeptId() == student.getDepartmentId()
+                    ).collect(Collectors.toList());
+            // find which section the student belong and get section id
+            int sectionId = getSectionId(matchedClassroomList, studentGroup);
+            updateDatabase(sectionId, student);
+        }
+        if (flag)
+            return new ApiResponse(200, HttpStatus.OK, "Classrooms Assigned");
+        else
+            return new ApiResponse(201, HttpStatus.SERVICE_UNAVAILABLE, "Classrooms NOT Assigned or already assigned");
+    }
+
+    public int getSectionId(List<Classrooms> matchedClassList, int studentGroup) {
+        int sectionId = 0;
+        for (Classrooms classroom : matchedClassList) {
+            ClassStats stats = classStatsRepo.findAllBySectionId(classroom.getSectionId());
+            switch (studentGroup) {
+                case 1: {
+                    if (stats.getGroupOneCount() > 0) {
+                        stats.setGroupOneCount(stats.getGroupOneCount() - 1);
+                        sectionId = stats.getSectionId();
+                        break;
+                    }
+                }
+                case 2: {
+                    if (stats.getGroupTwoCount() > 0) {
+                        stats.setGroupTwoCount(stats.getGroupTwoCount() - 1);
+                        sectionId = stats.getSectionId();
+                        break;
+                    }
+                }
+                case 3: {
+                    if (stats.getGroupThreeCount() > 0) {
+                        stats.setGroupThreeCount(stats.getGroupThreeCount() - 1);
+                        sectionId = stats.getSectionId();
+                        break;
+                    }
                 }
             }
+            if (sectionId != 0)
+                break;
         }
-        return new ApiResponse(200, HttpStatus.OK, "Classrooms Assigned");
+        return sectionId;
     }
 
-    public void assignClassroom(Classrooms classroom, StudentCollegeMap student){
-
-        // update total student count in a classroomd
-        Classrooms classrooms = classroomRepo.findBySectionId(classroom.getSectionId());
-        classroom.setTotalStudents(classrooms.getTotalStudents()-1);
-        classroomRepo.save(classroom);
-
-        // store student-class mapping details
-        StudentClassMap studentClassMap=new StudentClassMap();
-        studentClassMap.setCollegId(student.getCollegeId());
-        studentClassMap.setDeptId(classroom.getDeptId());
-        studentClassMap.setDeptName(classroom.getDeptName());
-        studentClassMap.setSectionId(classroom.getSectionId());
-        studentClassMap.setSectionName(classroom.getSectionName());
-        studentClassMap.setStudentId(student.getStudentId());
-        studentClassRepo.save(studentClassMap);
+    public int getStudentGroup(StudentCollegeMap student) {
+        RegisterStudent studentProfile = registerStudentRepo.findAllByRegId(student.getStudentId());
+        int markPercent = studentProfile.getMarksPercentage();
+        if (markPercent > 70)
+            return 1;
+        else if (markPercent > 40 && markPercent < 70)
+            return 2;
+        else
+            return 3;
     }
 
-    public ApiResponse getStudentClassMap(){
-        return new ApiResponse(200,HttpStatus.OK, studentClassRepo.findAll(),"StudentClassMap");
+    public boolean updateDatabase(int sectionId, StudentCollegeMap student) {
+        try {
+            // update classroom (desc totalstudent count ) and student-class map
+            Classrooms studentClassroom = classroomRepo.findBySectionId(sectionId);
+            studentClassroom.setTotalStudents(studentClassroom.getTotalStudents() - 1);
+            classroomRepo.save(studentClassroom);
+            StudentClassMap studentClassMap = new StudentClassMap();
+            studentClassMap.setStudentId(student.getStudentId());
+            studentClassMap.setCollegId(student.getCollegeId());
+            studentClassMap.setSectionId(studentClassroom.getSectionId());
+            studentClassMap.setSectionName(studentClassroom.getSectionName());
+            studentClassMap.setDeptId(student.getDepartmentId());
+            studentClassMap.setDeptName(studentClassroom.getDeptName());
+            studentClassRepo.save(studentClassMap);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+
     }
 
 }

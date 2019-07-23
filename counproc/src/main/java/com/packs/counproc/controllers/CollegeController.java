@@ -1,5 +1,6 @@
 package com.packs.counproc.controllers;
 
+import com.packs.counproc.models.CollegeModels.ClassStats;
 import com.packs.counproc.models.CollegeModels.Classrooms;
 import com.packs.counproc.models.CollegeModels.Colleges;
 import com.packs.counproc.models.requests.AddDepartment;
@@ -45,8 +46,9 @@ public class CollegeController {
         return collegeServices.getAllClassrooms(collegeId);
     }
 
-    @GetMapping("clg/assignclasses/{id}")
+    @PostMapping("clg/assignclasses/{id}")
     public ApiResponse assignclasses(@PathVariable("id") int collegeId){
+//        return collegeServices.assignclasses(collegeId);
         return collegeServices.assignclasses(collegeId);
     }
 
@@ -54,9 +56,20 @@ public class CollegeController {
     public ApiResponse getStudentClassMap(){
         return collegeServices.getStudentClassMap();
     }
+
+
+    @PostMapping("clg/classStats")
+    public ApiResponse addClassStats(@RequestBody ClassStats classStats){
+        return collegeServices.addClassStats(classStats);
+    }
+
+    @GetMapping("clg/classStats")
+    public ApiResponse getClassStats(){
+        return collegeServices.getClassStats();
+    }
 }
 
-//    Class Allocation:
-//        (1)Assigning the student to the class and provide the section to it .
-//        (2)3 assessments provide marks
-//        (3) Ensure Multiple database configuration for storing class,section and assessment ,mark details.
+// 2 database
+// assessments - DONE
+// assign classes based on marks - 2 students > 80, 2 > 70- DONE
+// corner cases

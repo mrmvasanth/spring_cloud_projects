@@ -33,4 +33,5 @@ public class UtilsService {
         List<StudentCollegeMap> studentCollegeMap=studentCollegeRepo.findAll();
         return new ApiResponse(200, HttpStatus.OK,studentCollegeMap,"Student College Map") ;
     }
+
 }

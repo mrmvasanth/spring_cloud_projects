@@ -1,5 +1,6 @@
 package com.packs.counproc.controllers;
 
+import com.packs.counproc.models.CollegeModels.ClassStats;
 import com.packs.counproc.models.RegisterModel.RegisterStudent;
 import com.packs.counproc.models.requests.ChooseCollege;
 import com.packs.counproc.models.responses.ApiResponse;
@@ -38,5 +39,9 @@ public class CounsellingController {
     public ApiResponse chooseCollege(@RequestBody ChooseCollege chooseCollege){
         return registerService.chooseCollege(chooseCollege);
     }
+
+
+
+
 
 }

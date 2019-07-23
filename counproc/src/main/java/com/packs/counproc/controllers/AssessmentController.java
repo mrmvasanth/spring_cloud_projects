@@ -1,7 +1,6 @@
 package com.packs.counproc.controllers;
+import com.packs.counproc.models.AssessmentModels.*;
 
-import com.packs.counproc.models.AssessmentModels.AssessmentScores;
-import com.packs.counproc.models.AssessmentModels.AssessmentsDetails;
 import com.packs.counproc.models.responses.ApiResponse;
 import com.packs.counproc.services.AssessmentsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +19,8 @@ public class AssessmentController {
     }
 
     @PostMapping("/add")
-    public ApiResponse addAssessment(@RequestBody AssessmentsDetails assessmentsDetails){
+    public ApiResponse addAssessment(@RequestBody AssessmentsDetails
+                                                 assessmentsDetails)throws Exception{
         return assessmentsService.addAssessment(assessmentsDetails);
     }
 
