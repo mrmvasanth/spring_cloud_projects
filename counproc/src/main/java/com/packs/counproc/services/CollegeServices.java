@@ -1,20 +1,24 @@
 package com.packs.counproc.services;
 
-import com.packs.counproc.models.CollegeModels.*;
-import com.packs.counproc.models.RegisterModel.RegisterStudent;
-import com.packs.counproc.models.RegisterModel.StudentCollegeMap;
-import com.packs.counproc.models.requests.AddDepartment;
-import com.packs.counproc.models.responses.ApiResponse;
-import com.packs.counproc.repositories.*;
-import com.packs.counproc.repositories.college.*;
-import com.packs.counproc.repositories.register.RegisterStudentRepo;
-import com.packs.counproc.repositories.register.StudentCollegeRepo;
+import com.packs.counproc.MongoServer.models.CollegeModels.*;
+import com.packs.counproc.MongoServer.models.RegisterModel.StudentCollegeMap;
+import com.packs.counproc.MongoServer.models.requests.AddDepartment;
+import com.packs.counproc.MongoServer.models.responses.ApiResponse;
+import com.packs.counproc.MongoServer.repositories.*;
+import com.packs.counproc.MongoServer.repositories.college.*;
+import com.packs.counproc.MongoServer.repositories.register.RegisterStudentRepo;
+import com.packs.counproc.MongoServer.repositories.register.StudentCollegeRepo;
+import com.packs.counproc.MysqlServer.models.RegisterStudent;
+import com.packs.counproc.MysqlServer.repositories.StudentRegRepository;
+import com.packs.counproc.models.ApiResponseBody;
 import com.packs.counproc.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -45,23 +49,36 @@ public class CollegeServices {
     RegisterStudentRepo registerStudentRepo;
 
     @Autowired
+    StudentRegRepository studentRegRepository;
+
+    @Autowired
     Utils utils;
 
-    public ApiResponse getAllColleges() {
-        return new ApiResponse(200, HttpStatus.OK, collegesRepo.findAll(), "All Colleges");
+    public ResponseEntity<ApiResponseBody> getAllColleges() {
+        ApiResponseBody apiResponseBody = new ApiResponseBody(collegesRepo.findAll(), "All colleges");
+        return ResponseEntity.ok(apiResponseBody);
     }
 
-    public ApiResponse addCollege(Colleges college) {
-        college.setCollegeId(utils.getIncCount("Colleges"));
-        Colleges collegeObj = collegesRepo.save(college);
-        return new ApiResponse(200, HttpStatus.OK, collegeObj.getCollegeId(), "College Added");
+    public ResponseEntity<ApiResponseBody> addCollege(Colleges college) {
+        try {
+            college.setCollegeId(utils.getIncCount("Colleges"));
+            collegesRepo.save(college);
+            ApiResponseBody apiResponseBody = new ApiResponseBody("Colleges added successfully");
+            return ResponseEntity.ok(apiResponseBody);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Internal server error");
+        }
+
     }
 
-    public ApiResponse getAllDepartment() {
-        return new ApiResponse(200, HttpStatus.OK, departmentListRepo.findAll(), "All Departments");
+    public ResponseEntity<ApiResponseBody> getAllDepartment() {
+        ApiResponseBody apiResponseBody = new ApiResponseBody(departmentListRepo.findAll(), "All Departments");
+        return ResponseEntity.ok(apiResponseBody);
     }
 
-    public ApiResponse addDepartment(AddDepartment addDepartment) {
+    public ResponseEntity<ApiResponseBody> addDepartment(AddDepartment addDepartment) {
+        ApiResponseBody apiResponseBody = null;
         List<Colleges> colleges = collegesRepo.findByCollegeName(addDepartment.getCollegeName());
         if (!colleges.isEmpty()) {
             DepartmentList department = new DepartmentList();
@@ -71,14 +88,15 @@ public class CollegeServices {
             department.setInTakeCount(addDepartment.getInTakeCount());
             department.setDeptId(utils.getIncCount("DepartmentList"));
             departmentListRepo.save(department);
-            return new ApiResponse(200, HttpStatus.OK, "Department Added");
+            apiResponseBody = new ApiResponseBody("Department added");
         } else {
-            return new ApiResponse(404, HttpStatus.NOT_FOUND, "Invalid college");
+            apiResponseBody = new ApiResponseBody(400, HttpStatus.BAD_REQUEST, "Invalid college name");
         }
-
+        return ResponseEntity.ok(apiResponseBody);
     }
 
-    public ApiResponse addClassroom(int collegeId, Classrooms addClassroom) {
+    public ResponseEntity<ApiResponseBody> addClassroom(int collegeId, Classrooms addClassroom) {
+        ApiResponseBody apiResponseBody = null;
         List<DepartmentList> deptList = departmentListRepo.findByDeptName(addClassroom.getDeptName());
         if (!deptList.isEmpty()) {
             for (DepartmentList department : deptList) {
@@ -95,34 +113,53 @@ public class CollegeServices {
                     classStats.setGroupTwoCount(0);
                     classStats.setGroupThreeCount(0);
                     classStatsRepo.save(classStats);
-                    return new ApiResponse(200, HttpStatus.OK, "Classrooms Added");
+                    apiResponseBody = new ApiResponseBody("Classrooms Added");
+                    return ResponseEntity.ok(apiResponseBody);
                 }
             }
-            return new ApiResponse(404, HttpStatus.NOT_FOUND, "Invalid College ID");
+            apiResponseBody = new ApiResponseBody(404, HttpStatus.NOT_FOUND, "Invalid College ID");
         } else
-            return new ApiResponse(404, HttpStatus.NOT_FOUND, "Invalid Department Name");
+            apiResponseBody = new ApiResponseBody(404, HttpStatus.NOT_FOUND, "Invalid Department Name");
+        return ResponseEntity.ok(apiResponseBody);
     }
 
-    public ApiResponse getAllClassrooms(int collegeId) {
-        return new ApiResponse(200, HttpStatus.OK,
-                classroomRepo.findByCollegeId(collegeId), "All Classrooms");
+    public ResponseEntity<ApiResponseBody> getAllClassrooms(int collegeId) {
+        ApiResponseBody apiResponseBody = new ApiResponseBody(classroomRepo.findByCollegeId(collegeId), "All classrooms");
+        return ResponseEntity.ok(apiResponseBody);
+
+    }
+
+    public ResponseEntity<ApiResponseBody> deleteClassroom(String classroomId) {
+        classroomRepo.deleteById(classroomId);
+        ApiResponseBody apiResponseBody = new ApiResponseBody("Classrooms deleted");
+        return ResponseEntity.ok(apiResponseBody);
     }
 
 
-    public ApiResponse addClassStats(ClassStats classStats) {
+    public ResponseEntity<ApiResponseBody> addClassStats(ClassStats classStats) {
         classStatsRepo.save(classStats);
-        return new ApiResponse(200, HttpStatus.OK, "ClassStats Added");
+        ApiResponseBody apiResponseBody = new ApiResponseBody("ClassStats Added");
+        return ResponseEntity.ok(apiResponseBody);
     }
 
-    public ApiResponse getClassStats() {
-        return new ApiResponse(200, HttpStatus.OK, classStatsRepo.findAll(), "All ClassStats ");
+    public ResponseEntity<ApiResponseBody> getClassStats() {
+        ApiResponseBody apiResponseBody = new ApiResponseBody(classStatsRepo.findAll(), "All ClassStats ");
+        return ResponseEntity.ok(apiResponseBody);
     }
 
-    public ApiResponse getStudentClassMap() {
-        return new ApiResponse(200, HttpStatus.OK, studentClassRepo.findAll(), "StudentClassMap");
+    public ResponseEntity<ApiResponseBody> deleteStats() {
+        classStatsRepo.deleteAll();
+        ApiResponseBody apiResponseBody = new ApiResponseBody("All ClassStats Deleted");
+        return ResponseEntity.ok(apiResponseBody);
     }
 
-    public ApiResponse assignclasses(int collegeId) {
+    public ResponseEntity<ApiResponseBody> getStudentClassMap() {
+        ApiResponseBody apiResponseBody = new ApiResponseBody(studentClassRepo.findAll(), "StudentClassMap");
+        return ResponseEntity.ok(apiResponseBody);
+    }
+
+    public ResponseEntity<ApiResponseBody> assignclasses(int collegeId) {
+        ApiResponseBody apiResponseBody = null;
         boolean flag = false;
         // get all classrooms in the college
         List<Classrooms> classroomsInCollege = classroomRepo.findByCollegeId(collegeId);
@@ -136,12 +173,14 @@ public class CollegeServices {
                     ).collect(Collectors.toList());
             // find which section the student belong and get section id
             int sectionId = getSectionId(matchedClassroomList, studentGroup);
-            updateDatabase(sectionId, student);
+            flag = updateDatabase(sectionId, student);
         }
         if (flag)
-            return new ApiResponse(200, HttpStatus.OK, "Classrooms Assigned");
+            apiResponseBody = new ApiResponseBody(200, HttpStatus.OK, "Classrooms Assigned");
         else
-            return new ApiResponse(201, HttpStatus.SERVICE_UNAVAILABLE, "Classrooms NOT Assigned or already assigned");
+            apiResponseBody = new ApiResponseBody(201, HttpStatus.SERVICE_UNAVAILABLE, "Classrooms NOT Assigned or already assigned");
+
+        return ResponseEntity.ok(apiResponseBody);
     }
 
     public int getSectionId(List<Classrooms> matchedClassList, int studentGroup) {
@@ -153,6 +192,7 @@ public class CollegeServices {
                     if (stats.getGroupOneCount() > 0) {
                         stats.setGroupOneCount(stats.getGroupOneCount() - 1);
                         sectionId = stats.getSectionId();
+                        classStatsRepo.save(stats);
                         break;
                     }
                 }
@@ -178,8 +218,9 @@ public class CollegeServices {
     }
 
     public int getStudentGroup(StudentCollegeMap student) {
-        RegisterStudent studentProfile = registerStudentRepo.findAllByRegId(student.getStudentId());
-        int markPercent = studentProfile.getMarksPercentage();
+//        RegisterStudent studentProfile = registerStudentRepo.findAllByRegId(student.getStudentId());
+        Optional<RegisterStudent> studentProfile = studentRegRepository.findById(student.getStudentId());
+        int markPercent = studentProfile.get().getMarksPercentage();
         if (markPercent > 70)
             return 1;
         else if (markPercent > 40 && markPercent < 70)

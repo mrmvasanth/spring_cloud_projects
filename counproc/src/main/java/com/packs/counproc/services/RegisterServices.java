@@ -1,31 +1,38 @@
 package com.packs.counproc.services;
 
-import com.packs.counproc.models.CollegeModels.Colleges;
-import com.packs.counproc.models.CollegeModels.DepartmentList;
-import com.packs.counproc.models.RegisterModel.RegisterStudent;
-import com.packs.counproc.models.RegisterModel.StudentCollegeMap;
-import com.packs.counproc.models.requests.ChooseCollege;
-import com.packs.counproc.models.responses.ApiResponse;
-import com.packs.counproc.models.responses.AvailableColleges;
-import com.packs.counproc.repositories.college.CollegesRepo;
-import com.packs.counproc.repositories.college.DepartmentListRepo;
-import com.packs.counproc.repositories.register.RegisterStudentRepo;
-import com.packs.counproc.repositories.register.StudentCollegeRepo;
+import com.packs.counproc.MongoServer.models.CollegeModels.Colleges;
+import com.packs.counproc.MongoServer.models.CollegeModels.DepartmentList;
+import com.packs.counproc.MongoServer.models.RegisterModel.StudentCollegeMap;
+import com.packs.counproc.MongoServer.models.requests.ChooseCollege;
+import com.packs.counproc.MongoServer.models.responses.ApiResponse;
+import com.packs.counproc.MongoServer.models.responses.AvailableColleges;
+import com.packs.counproc.MongoServer.repositories.college.CollegesRepo;
+import com.packs.counproc.MongoServer.repositories.college.DepartmentListRepo;
+import com.packs.counproc.MongoServer.repositories.register.RegisterStudentRepo;
+import com.packs.counproc.MongoServer.repositories.register.StudentCollegeRepo;
+import com.packs.counproc.MysqlServer.models.RegisterStudent;
+import com.packs.counproc.MysqlServer.repositories.StudentRegRepository;
+import com.packs.counproc.models.ApiResponseBody;
 import com.packs.counproc.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class RegisterServices {
 
     @Autowired
     RegisterStudentRepo registerStudentRepo;
+
+    @Autowired
+    StudentRegRepository studentRegRepository;
 
     @Autowired
     CollegesRepo collegesRepo;
@@ -47,63 +54,45 @@ public class RegisterServices {
         return new ApiResponse(200, "CounProc Server Alive");
     }
 
-    public ApiResponse resgisterStudent(RegisterStudent student) {
-        student.setRegisteredOn(new Date());
-        student.setCalled(false);
-        student.setRegId(utils.getIncCount("RegisterId"));
-        registerStudentRepo.save(student);
-        String response = "Your registration ID is: " + student.getRegId();
-        return new ApiResponse(200, HttpStatus.OK, response, "Registration Success");
-    }
+//    public ApiResponse resgisterStudent(RegisterStudent student) {
+//        student.setRegisteredOn(new Date());
+//        student.setCalled(false);
+//        student.setRegId(utils.getIncCount("RegisterId"));
+//        registerStudentRepo.save(student);
+//        String response = "Your registration ID is: " + student.getRegId();
+//        return new ApiResponse(200, HttpStatus.OK, response, "Registration Success");
+//    }
 
-    public ApiResponse getAllStudents() {
-        List studentsList = registerStudentRepo.findAll();
-        return new ApiResponse(200, HttpStatus.OK, studentsList, "All registered students");
-    }
+//    public ApiResponse getAllStudents() {
+//        List studentsList = registerStudentRepo.findAll();
+//        return new ApiResponse(200, HttpStatus.OK, studentsList, "All registered students");
+//    }
 
-    public ApiResponse sendEmails() {
-        boolean flag = false;
-        // define sort properties to sord by mark percentage
-        Sort sort = new Sort(Sort.Direction.DESC, "marksPercentage");
-
-        // get students with called status=false
-        List<RegisterStudent> registerStudents = registerStudentRepo.findByCalled(false, sort);
-
-        if (registerStudents.size() > 0)
-            flag = mailServices.sendEmail(registerStudents);
-        else
-            flag = true;
-
-        if (flag)
-            return new ApiResponse(200, HttpStatus.OK, registerStudents, "Emails sent");
-        else
-            return new ApiResponse(500, HttpStatus.INTERNAL_SERVER_ERROR, "Emails Not sent");
-    }
-
-    public ApiResponse chooseCollege(ChooseCollege chooseCollege) {
+    public ResponseEntity<ApiResponseBody> chooseCollege(ChooseCollege chooseCollege) {
         if (utils.validateStudent(chooseCollege)) {
             return checkAndEnroll(chooseCollege);
-        } else
-            return new ApiResponse(400, HttpStatus.BAD_REQUEST, "Invalid Reg Id/counsellingCode or already processed");
+        } else {
+            ApiResponseBody apiResponseBody = new ApiResponseBody(400, HttpStatus.BAD_REQUEST, "Invalid Reg Id/counsellingCode or already processed");
+            return ResponseEntity.ok(apiResponseBody);
+        }
     }
 
-    ApiResponse checkAndEnroll(ChooseCollege chooseCollege) {
+    ResponseEntity<ApiResponseBody> checkAndEnroll(ChooseCollege chooseCollege) {
+        ApiResponseBody apiResponseBody = null;
         List<AvailableColleges> availableCollegesList = new ArrayList<>();
         ApiResponse apiResponse = new ApiResponse();
-        boolean enrolledStatus = false;
         List<Colleges> colleges = collegesRepo.findByCollegeName(chooseCollege.getCollegeName());
         if (!colleges.isEmpty()) {
             List<DepartmentList> departmentList = departmentListRepo.findByCollegeId(colleges.get(0).getCollegeId());
             for (DepartmentList departments : departmentList) {
                 if (departments.getInTakeCount() > 0 && departments.getDeptName().equals(chooseCollege.getDeptName())) {
                     // enroll the student to the college and dept
-                    apiResponse = enrollStudent(chooseCollege, departments);
-                    break;
+                    return  enrollStudent(chooseCollege, departments);
                 } else {
-                    if (departments.getInTakeCount() > 0){
-                        Colleges collegeObj=collegesRepo.findByCollegeId(departments.getCollegeId());
+                    if (departments.getInTakeCount() > 0) {
+                        Colleges collegeObj = collegesRepo.findByCollegeId(departments.getCollegeId());
 
-                        AvailableColleges college=new AvailableColleges();
+                        AvailableColleges college = new AvailableColleges();
 
                         college.setAvailableSeats(departments.getInTakeCount());
                         college.setDepartmentName(departments.getDeptName());
@@ -112,18 +101,22 @@ public class RegisterServices {
                         availableCollegesList.add(college);
                     }
                     // get list of available departments
-                    apiResponse = new ApiResponse(204, HttpStatus.OK, availableCollegesList, "Requested department not available, select from following ");
+                    apiResponseBody = new ApiResponseBody(availableCollegesList, "Requested department not available, select from following ");
                 }
             }
-            return apiResponse;
+            return ResponseEntity.ok(apiResponseBody);
         } else {
-            return new ApiResponse(400, HttpStatus.BAD_REQUEST, "Invalid College");
+            apiResponseBody = new ApiResponseBody(400, HttpStatus.BAD_REQUEST, "Invalid College");
+            return ResponseEntity.ok(apiResponseBody);
         }
     }
 
-    ApiResponse enrollStudent(ChooseCollege chooseCollege, DepartmentList department) {
+    ResponseEntity<ApiResponseBody> enrollStudent(ChooseCollege chooseCollege, DepartmentList department) {
+        ApiResponseBody apiResponseBody = null;
         try {
-            List<RegisterStudent> student = registerStudentRepo.findByRegId(chooseCollege.getRegId());
+//            List<RegisterStudent> student = registerStudentRepo.findByRegId(chooseCollege.getRegId());
+            Optional<RegisterStudent> student = studentRegRepository.findById(chooseCollege.getRegId());
+
             // update department table
             department.setInTakeCount(department.getInTakeCount() - 1);
             departmentListRepo.save(department);
@@ -131,14 +124,15 @@ public class RegisterServices {
             StudentCollegeMap studentCollegeMap = new StudentCollegeMap();
             studentCollegeMap.setCollegeId(department.getCollegeId());
             studentCollegeMap.setDepartmentId(department.getDeptId());
-            studentCollegeMap.setStudentId(student.get(0).getRegId());
+            studentCollegeMap.setStudentId(student.get().getId());
             studentCollegeRepo.save(studentCollegeMap);
-            student.get(0).setAssigned(true);
-            registerStudentRepo.save(student.get(0));
-            return new ApiResponse(200, "Student enrolled Successfully");
+            student.get().setCollegeAssigned(true);
+            studentRegRepository.save(student.get());
+            apiResponseBody = new ApiResponseBody(200, HttpStatus.OK, "Student enrolled Successfully");
+            return ResponseEntity.ok(apiResponseBody);
         } catch (Exception e) {
             e.printStackTrace();
-            return new ApiResponse(500, HttpStatus.INTERNAL_SERVER_ERROR, "Server error");
+            throw new RuntimeException("Internal server error");
         }
 
     }

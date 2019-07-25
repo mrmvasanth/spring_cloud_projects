@@ -1,9 +1,11 @@
 package com.packs.counproc.controllers;
-import com.packs.counproc.models.AssessmentModels.*;
+import com.packs.counproc.MongoServer.models.AssessmentModels.*;
 
-import com.packs.counproc.models.responses.ApiResponse;
+import com.packs.counproc.MongoServer.models.responses.ApiResponse;
+import com.packs.counproc.models.ApiResponseBody;
 import com.packs.counproc.services.AssessmentsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -14,28 +16,28 @@ public class AssessmentController {
     AssessmentsService assessmentsService;
 
     @GetMapping("/all")
-    public ApiResponse getAllAssessments(){
+    public ResponseEntity<ApiResponseBody> getAllAssessments(){
         return assessmentsService.getAllAssessments();
     }
 
     @PostMapping("/add")
-    public ApiResponse addAssessment(@RequestBody AssessmentsDetails
+    public ResponseEntity<ApiResponseBody> addAssessment(@RequestBody AssessmentsDetails
                                                  assessmentsDetails)throws Exception{
         return assessmentsService.addAssessment(assessmentsDetails);
     }
 
     @PostMapping("/marks")
-    public ApiResponse addMarks(@RequestBody AssessmentScores assessmentScores){
+    public ResponseEntity<ApiResponseBody> addMarks(@RequestBody AssessmentScores assessmentScores){
         return assessmentsService.addMarks(assessmentScores);
     }
 
     @GetMapping("/report")
-    public ApiResponse getReport(){
+    public ResponseEntity<ApiResponseBody> getReport(){
         return assessmentsService.getReport();
     }
 
     @GetMapping("/report/{id}")
-    public ApiResponse getReportByStudent(@PathVariable("id") int studentId){
+    public ResponseEntity<ApiResponseBody> getReportByStudent(@PathVariable("id") int studentId){
         return assessmentsService.getReportByStudent(studentId);
     }
 

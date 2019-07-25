@@ -1,10 +1,12 @@
 package com.packs.counproc.controllers;
 
-import com.packs.counproc.models.DatabaseSequence;
-import com.packs.counproc.models.responses.ApiResponse;
+import com.packs.counproc.MongoServer.models.DatabaseSequence;
+import com.packs.counproc.MongoServer.models.responses.ApiResponse;
+import com.packs.counproc.models.ApiResponseBody;
 import com.packs.counproc.services.CleanService;
 import com.packs.counproc.services.UtilsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,22 +20,37 @@ public class UtilsController {
     CleanService cleanService;
 
     @PostMapping("/seq/add")
-    public ApiResponse addSequence(@RequestBody DatabaseSequence addSequence){
-        return  utilsService.addSequence(addSequence);
+    public ApiResponse addSequence(@RequestBody DatabaseSequence addSequence) {
+        return utilsService.addSequence(addSequence);
     }
 
     @GetMapping("/seq/getall")
-    public ApiResponse getAllSequence(){
+    public ApiResponse getAllSequence() {
         return utilsService.getAllSequence();
     }
 
     @GetMapping("studentcollege")
-    public ApiResponse getStudentCollegeMap(){
+    public ResponseEntity<ApiResponseBody> getStudentCollegeMap() {
         return utilsService.getStudentCollegeMap();
     }
 
     @GetMapping("clean")
-    public ApiResponse cleanDatabase(){
+    public ApiResponse cleanDatabase() {
         return cleanService.cleanDatabase();
+    }
+
+    @DeleteMapping("deletecolleges")
+    public ResponseEntity<ApiResponseBody> deleteAllColleges() {
+        return cleanService.deleteAllCollege();
+    }
+
+    @DeleteMapping("deletedepartments")
+    public ResponseEntity<ApiResponseBody> deleteAllDepartments() {
+        return cleanService.deleteAllDepartments();
+    }
+
+    @DeleteMapping("deleteclassrooms")
+    public ResponseEntity<ApiResponseBody> deleteAllClassrooms() {
+        return cleanService.deleteAllClassrooms();
     }
 }

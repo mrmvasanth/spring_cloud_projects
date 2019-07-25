@@ -1,15 +1,14 @@
 package com.packs.counproc.services;
 
-import com.packs.counproc.models.DatabaseSequence;
-import com.packs.counproc.models.RegisterModel.StudentCollegeMap;
-import com.packs.counproc.models.responses.ApiResponse;
-import com.packs.counproc.repositories.DatabaseSequenceRepo;
-import com.packs.counproc.repositories.register.StudentCollegeRepo;
+import com.packs.counproc.MongoServer.models.DatabaseSequence;
+import com.packs.counproc.MongoServer.models.responses.ApiResponse;
+import com.packs.counproc.MongoServer.repositories.DatabaseSequenceRepo;
+import com.packs.counproc.MongoServer.repositories.register.StudentCollegeRepo;
+import com.packs.counproc.models.ApiResponseBody;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class UtilsService {
@@ -29,9 +28,9 @@ public class UtilsService {
        return new ApiResponse(200, HttpStatus.OK,databaseSequenceRepo.findAll(),"All sequence") ;
     }
 
-    public ApiResponse getStudentCollegeMap(){
-        List<StudentCollegeMap> studentCollegeMap=studentCollegeRepo.findAll();
-        return new ApiResponse(200, HttpStatus.OK,studentCollegeMap,"Student College Map") ;
+    public ResponseEntity<ApiResponseBody> getStudentCollegeMap(){
+        ApiResponseBody apiResponseBody=new ApiResponseBody(studentCollegeRepo.findAll(),"Student College Map");
+        return ResponseEntity.ok(apiResponseBody);
     }
 
 }

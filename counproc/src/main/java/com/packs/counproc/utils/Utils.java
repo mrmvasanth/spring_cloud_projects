@@ -1,16 +1,18 @@
 package com.packs.counproc.utils;
 
 
-import com.packs.counproc.models.DatabaseSequence;
-import com.packs.counproc.models.RegisterModel.RegisterStudent;
-import com.packs.counproc.models.requests.ChooseCollege;
-import com.packs.counproc.repositories.DatabaseSequenceRepo;
-import com.packs.counproc.repositories.register.RegisterStudentRepo;
+import com.packs.counproc.MongoServer.models.DatabaseSequence;
+import com.packs.counproc.MongoServer.models.requests.ChooseCollege;
+import com.packs.counproc.MongoServer.repositories.DatabaseSequenceRepo;
+import com.packs.counproc.MongoServer.repositories.register.RegisterStudentRepo;
+import com.packs.counproc.MysqlServer.models.RegisterStudent;
+import com.packs.counproc.MysqlServer.repositories.StudentRegRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class Utils {
@@ -20,6 +22,9 @@ public class Utils {
 
     @Autowired
     RegisterStudentRepo registerStudentRepo;
+
+    @Autowired
+    StudentRegRepository studentRegRepository;
 
     @Autowired
     DatabaseSequenceRepo databaseSequenceRepo;
@@ -57,11 +62,11 @@ public class Utils {
     }
 
     public boolean validateStudent(ChooseCollege chooseCollege                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  ) {
-        List<RegisterStudent> student = registerStudentRepo.findByRegId(chooseCollege.getRegId());
-        if (!student.isEmpty()) {
-            if (student.get(0).getRegId()==(chooseCollege.getRegId()) &&
-                    student.get(0).getCounsellingCode().equals(chooseCollege.getCounsellingCode()) &&
-                    !student.get(0).isAssigned())
+        Optional<RegisterStudent> student = studentRegRepository.findById(chooseCollege.getRegId());
+        if (student.isPresent()) {
+            if (student.get().getId()==(chooseCollege.getRegId()) &&
+                    student.get().getCounsellingCode().equals(chooseCollege.getCounsellingCode()) &&
+                    !student.get().isCollegeAssigned())
                 return true;
             else
                 return false;

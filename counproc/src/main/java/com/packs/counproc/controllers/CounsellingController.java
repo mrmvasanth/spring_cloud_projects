@@ -1,47 +1,48 @@
 package com.packs.counproc.controllers;
 
-import com.packs.counproc.models.CollegeModels.ClassStats;
-import com.packs.counproc.models.RegisterModel.RegisterStudent;
-import com.packs.counproc.models.requests.ChooseCollege;
-import com.packs.counproc.models.responses.ApiResponse;
+
+import com.packs.counproc.MongoServer.models.requests.ChooseCollege;
+import com.packs.counproc.MysqlServer.models.RegisterStudent;
+
+import com.packs.counproc.models.ApiResponseBody;
+import com.packs.counproc.services.CounsellingService;
 import com.packs.counproc.services.RegisterServices;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 @RestController
-@RequestMapping("/api/co")
+@RequestMapping("/api/con")
 public class CounsellingController {
+
+    @Autowired
+    CounsellingService counsellingService;
 
     @Autowired
     RegisterServices registerService;
 
-    @GetMapping("/")
-    public ApiResponse counproc() {
-        return registerService.testCounProcServer();
+
+    @GetMapping("/get")
+    public ResponseEntity<ApiResponseBody> getAllRegistredStudents(){
+            return counsellingService.getAllRegistredStudents();
     }
 
     @PostMapping("/register")
-    public ApiResponse registerStudents(@RequestBody RegisterStudent student) {
-        return registerService.resgisterStudent(student);
+    public ResponseEntity<ApiResponseBody> registerStudent(@Valid @RequestBody RegisterStudent registerStudent){
+        return counsellingService.registerStudent(registerStudent);
     }
 
-    @GetMapping("/getall")
-    public ApiResponse getAllStudent() {
-        return registerService.getAllStudents();
-    }
-
-    @GetMapping("/sendcalls")
-    public ApiResponse sendEmails() {
-        return registerService.sendEmails();
+    @GetMapping("/sendinvites")
+    public ResponseEntity<ApiResponseBody> sendInvites(){
+        return counsellingService.sendInvites();
     }
 
     @PostMapping("/choosecollege")
-    public ApiResponse chooseCollege(@RequestBody ChooseCollege chooseCollege){
+    public ResponseEntity<ApiResponseBody> chooseCollege(@RequestBody ChooseCollege chooseCollege){
         return registerService.chooseCollege(chooseCollege);
     }
-
-
-
 
 
 }
