@@ -4,7 +4,7 @@ import com.packs.counproc.MongoServer.models.requests.ChooseCollege;
 import com.packs.counproc.MongoServer.models.responses.ApiResponse;
 import com.packs.counproc.MysqlServer.models.RegisterStudent;
 import com.packs.counproc.MysqlServer.repositories.StudentRegRepository;
-import com.packs.counproc.exceptions.ConflictException;
+
 import com.packs.counproc.models.ApiResponseBody;
 import com.packs.counproc.utils.Utils;
 import org.hibernate.exception.ConstraintViolationException;
@@ -44,13 +44,14 @@ public class CounsellingService {
     }
 
     public ResponseEntity<ApiResponseBody> registerStudent(RegisterStudent registerStudent) {
-        try {
+//        try {
             RegisterStudent student = studentRegRepository.save(registerStudent);
             ApiResponseBody apiResponseBody = new ApiResponseBody(student.getId(), "Your registrations ID");
             return ResponseEntity.ok(apiResponseBody);
-        } catch (DataIntegrityViolationException e) {
-            throw new ConflictException(e.getLocalizedMessage());
-        }
+//        } catch (DataIntegrityViolationException e) {
+//            throw new ConflictException(e.getLocalizedMessage());
+//
+//        }
 
     }
 

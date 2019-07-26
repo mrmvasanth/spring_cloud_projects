@@ -3,10 +3,8 @@ package com.packs.counproc.services;
 import com.packs.counproc.MongoServer.models.CollegeModels.*;
 import com.packs.counproc.MongoServer.models.RegisterModel.StudentCollegeMap;
 import com.packs.counproc.MongoServer.models.requests.AddDepartment;
-import com.packs.counproc.MongoServer.models.responses.ApiResponse;
 import com.packs.counproc.MongoServer.repositories.*;
 import com.packs.counproc.MongoServer.repositories.college.*;
-import com.packs.counproc.MongoServer.repositories.register.RegisterStudentRepo;
 import com.packs.counproc.MongoServer.repositories.register.StudentCollegeRepo;
 import com.packs.counproc.MysqlServer.models.RegisterStudent;
 import com.packs.counproc.MysqlServer.repositories.StudentRegRepository;
@@ -46,9 +44,6 @@ public class CollegeServices {
     ClassStatsRepo classStatsRepo;
 
     @Autowired
-    RegisterStudentRepo registerStudentRepo;
-
-    @Autowired
     StudentRegRepository studentRegRepository;
 
     @Autowired
@@ -60,10 +55,15 @@ public class CollegeServices {
     }
 
     public ResponseEntity<ApiResponseBody> addCollege(Colleges college) {
+        ApiResponseBody apiResponseBody = null;
         try {
-            college.setCollegeId(utils.getIncCount("Colleges"));
-            collegesRepo.save(college);
-            ApiResponseBody apiResponseBody = new ApiResponseBody("Colleges added successfully");
+            List<Colleges> colleges = collegesRepo.findByCollegeName(college.getCollegeName());
+            if (colleges.isEmpty()) {
+                college.setCollegeId(utils.getIncCount("Colleges"));
+                collegesRepo.save(college);
+                apiResponseBody = new ApiResponseBody("Colleges added successfully");
+            } else
+                apiResponseBody = new ApiResponseBody(409, HttpStatus.CONFLICT, "Colleges already present");
             return ResponseEntity.ok(apiResponseBody);
         } catch (Exception e) {
             e.printStackTrace();
@@ -81,14 +81,20 @@ public class CollegeServices {
         ApiResponseBody apiResponseBody = null;
         List<Colleges> colleges = collegesRepo.findByCollegeName(addDepartment.getCollegeName());
         if (!colleges.isEmpty()) {
-            DepartmentList department = new DepartmentList();
-            department.setCollegeId(colleges.get(0).getCollegeId());
-            department.setDeptName(addDepartment.getDepartmentName());
-            department.setDeptDesc(addDepartment.getDescription());
-            department.setInTakeCount(addDepartment.getInTakeCount());
-            department.setDeptId(utils.getIncCount("DepartmentList"));
-            departmentListRepo.save(department);
-            apiResponseBody = new ApiResponseBody("Department added");
+            if (!departmentListRepo.existsByCollegeIdAndDeptName(colleges.get(0).getCollegeId(),
+                    addDepartment.getDepartmentName())) {
+
+
+                DepartmentList department = new DepartmentList();
+                department.setCollegeId(colleges.get(0).getCollegeId());
+                department.setDeptName(addDepartment.getDepartmentName());
+                department.setDeptDesc(addDepartment.getDescription());
+                department.setInTakeCount(addDepartment.getInTakeCount());
+                department.setDeptId(utils.getIncCount("DepartmentList"));
+                departmentListRepo.save(department);
+                apiResponseBody = new ApiResponseBody("Department added");
+            } else
+                apiResponseBody = new ApiResponseBody("Already present");
         } else {
             apiResponseBody = new ApiResponseBody(400, HttpStatus.BAD_REQUEST, "Invalid college name");
         }
@@ -96,25 +102,34 @@ public class CollegeServices {
     }
 
     public ResponseEntity<ApiResponseBody> addClassroom(int collegeId, Classrooms addClassroom) {
+        boolean flag = false;
         ApiResponseBody apiResponseBody = null;
         List<DepartmentList> deptList = departmentListRepo.findByDeptName(addClassroom.getDeptName());
         if (!deptList.isEmpty()) {
             for (DepartmentList department : deptList) {
                 if (department.getCollegeId() == collegeId) {
+                    flag = classroomRepo.existsByCollegeIdAndDeptIdAndSectionName(department.getCollegeId(),
+                            department.getDeptId(), addClassroom.getSectionName());
+                    if (!flag) {
+                        addClassroom.setCollegeId(collegeId);
+                        addClassroom.setDeptId(deptList.get(0).getDeptId());
+                        addClassroom.setSectionId(utils.getIncCount("ClassRoomId"));
+                        classroomRepo.save(addClassroom);
 
-                    addClassroom.setCollegeId(collegeId);
-                    addClassroom.setDeptId(deptList.get(0).getDeptId());
-                    addClassroom.setSectionId(utils.getIncCount("ClassRoomId"));
-                    classroomRepo.save(addClassroom);
+                        ClassStats classStats = new ClassStats();
+                        classStats.setSectionId(addClassroom.getSectionId());
+                        classStats.setGroupOneCount(0);
+                        classStats.setGroupTwoCount(0);
+                        classStats.setGroupThreeCount(0);
+                        classStatsRepo.save(classStats);
+                        apiResponseBody = new ApiResponseBody("Classrooms Added");
+                        return ResponseEntity.ok(apiResponseBody);
+                    } else {
+                        apiResponseBody = new ApiResponseBody(409, HttpStatus.CONFLICT,
+                                "Classroom already present");
+                        return ResponseEntity.ok(apiResponseBody);
+                    }
 
-                    ClassStats classStats = new ClassStats();
-                    classStats.setSectionId(addClassroom.getSectionId());
-                    classStats.setGroupOneCount(0);
-                    classStats.setGroupTwoCount(0);
-                    classStats.setGroupThreeCount(0);
-                    classStatsRepo.save(classStats);
-                    apiResponseBody = new ApiResponseBody("Classrooms Added");
-                    return ResponseEntity.ok(apiResponseBody);
                 }
             }
             apiResponseBody = new ApiResponseBody(404, HttpStatus.NOT_FOUND, "Invalid College ID");
@@ -137,9 +152,18 @@ public class CollegeServices {
 
 
     public ResponseEntity<ApiResponseBody> addClassStats(ClassStats classStats) {
-        classStatsRepo.save(classStats);
-        ApiResponseBody apiResponseBody = new ApiResponseBody("ClassStats Added");
-        return ResponseEntity.ok(apiResponseBody);
+        Optional<ClassStats> classStatsFromDB=classStatsRepo.findBySectionId(classStats.getSectionId());
+        if(classStatsFromDB.isPresent()){
+            classStats.setId(classStatsFromDB.get().getId());
+            classStatsRepo.save(classStats);
+            ApiResponseBody apiResponseBody = new ApiResponseBody("ClassStats Updated");
+            return ResponseEntity.ok(apiResponseBody);
+        }else {
+            classStatsRepo.save(classStats);
+            ApiResponseBody apiResponseBody = new ApiResponseBody("ClassStats Added");
+            return ResponseEntity.ok(apiResponseBody);
+        }
+
     }
 
     public ResponseEntity<ApiResponseBody> getClassStats() {

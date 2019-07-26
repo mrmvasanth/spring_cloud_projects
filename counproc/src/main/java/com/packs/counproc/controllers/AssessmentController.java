@@ -26,7 +26,7 @@ public class AssessmentController {
         return assessmentsService.addAssessment(assessmentsDetails);
     }
 
-    @PostMapping("/marks")
+    @PostMapping("/scores")
     public ResponseEntity<ApiResponseBody> addMarks(@RequestBody AssessmentScores assessmentScores){
         return assessmentsService.addMarks(assessmentScores);
     }
@@ -39,6 +39,15 @@ public class AssessmentController {
     @GetMapping("/report/{id}")
     public ResponseEntity<ApiResponseBody> getReportByStudent(@PathVariable("id") int studentId){
         return assessmentsService.getReportByStudent(studentId);
+    }
+
+    @DeleteMapping("/details")
+    public ResponseEntity<ApiResponseBody> deleteAllAssessments(){
+        return assessmentsService.deleteAllAssessments();
+    }
+    @DeleteMapping("/scores")
+    public ResponseEntity<ApiResponseBody> deleteAllScores(){
+        return assessmentsService.deleteAllScores();
     }
 
 }

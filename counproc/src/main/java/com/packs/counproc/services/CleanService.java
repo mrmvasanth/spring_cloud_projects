@@ -7,15 +7,12 @@ import com.packs.counproc.MongoServer.repositories.college.ClassroomRepo;
 import com.packs.counproc.MongoServer.repositories.college.CollegesRepo;
 import com.packs.counproc.MongoServer.repositories.college.DepartmentListRepo;
 import com.packs.counproc.MongoServer.repositories.college.StudentClassRepo;
-import com.packs.counproc.MongoServer.repositories.register.RegisterStudentRepo;
 import com.packs.counproc.MongoServer.repositories.register.StudentCollegeRepo;
 import com.packs.counproc.models.ApiResponseBody;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
-import javax.xml.ws.Response;
 
 @Service
 public class CleanService {
@@ -31,8 +28,6 @@ public class CleanService {
     @Autowired
     DepartmentListRepo departmentListRepo;
     @Autowired
-    RegisterStudentRepo registerStudentRepo;
-    @Autowired
     StudentCollegeRepo studentCollegeRepo;
     @Autowired
     StudentClassRepo studentClassRepo;
@@ -43,7 +38,6 @@ public class CleanService {
         classroomRepo.deleteAll();
         collegesRepo.deleteAll();;
         departmentListRepo.deleteAll();
-        registerStudentRepo.deleteAll();
         studentCollegeRepo.deleteAll();
         studentClassRepo.deleteAll();
         return new ApiResponse(200, HttpStatus.OK, "Cleaned");

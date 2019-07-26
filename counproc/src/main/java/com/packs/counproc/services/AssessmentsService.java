@@ -56,7 +56,7 @@ public class AssessmentsService {
     }
 
     public ResponseEntity<ApiResponseBody> getReport(){
-        apiResponseBody=new ApiResponseBody(assessmentScoresRepo.findAll(),"Assessment Report");
+        apiResponseBody=new ApiResponseBody(assessmentScoresRepo.findAll (),"Assessment Report");
         return ResponseEntity.ok(apiResponseBody);
     }
 
@@ -65,4 +65,17 @@ public class AssessmentsService {
         return ResponseEntity.ok(apiResponseBody);
     }
 
+    public ResponseEntity<ApiResponseBody> deleteAllAssessments(){
+        assessmentDetailsRepo.deleteAll();
+        apiResponseBody=new ApiResponseBody(200, HttpStatus.OK,"All Assessment Deleted");
+        return ResponseEntity.ok(apiResponseBody);
+    }
+
+    public ResponseEntity<ApiResponseBody> deleteAllScores(){
+        assessmentScoresRepo.deleteAll();
+        apiResponseBody=new ApiResponseBody(200, HttpStatus.OK,"All Scores Deleted");
+        return ResponseEntity.ok(apiResponseBody);
+    }
+
 }
+

@@ -12,4 +12,6 @@ public interface ClassroomRepo extends MongoRepository<Classrooms, String> {
 
     List<Classrooms> findByCollegeId(int collegeId);
 
+    boolean existsByCollegeIdAndDeptIdAndSectionName(int collegeId,int deptId, String sectionName);
+
 }

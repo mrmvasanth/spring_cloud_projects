@@ -1,23 +1,18 @@
 package com.packs.counproc.MysqlServer.models;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import org.hibernate.annotations.CreationTimestamp;
-import org.joda.time.DateTime;
+import lombok.*;
 
+import org.hibernate.annotations.CreationTimestamp;
 import javax.persistence.*;
 import javax.validation.Valid;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import java.sql.Timestamp;
+import javax.validation.constraints.*;
 import java.util.Date;
 
 @Getter
 @Setter
-@ToString
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity(name = "registerStudent")
 @Table(uniqueConstraints ={@UniqueConstraint(columnNames = {"email"})})
 public class RegisterStudent {
@@ -27,13 +22,19 @@ public class RegisterStudent {
     @GeneratedValue(strategy = GenerationType.IDENTITY,generator = "seq_gen")
     int id;
 
+    @Pattern(regexp = "^[A-Za-z]+$",message = "Student name must contains alphabets only")
+    @NotNull(message = "Student name cannot be null")
+    @NotBlank (message = "Student name cannot be blank")
+    @NotEmpty(message = "Student name cannot be empty")
     String studentName;
 
     String schoolName;
 
+    @Min(value = 0,message = "Marks must not be less than 0")
+    @Max(value = 100,message = "Marks must not be greater than 100")
     int marksPercentage;
 
-    @Email @NotBlank @NotNull
+    @Email @NotNull
     String email;
 
     boolean called;

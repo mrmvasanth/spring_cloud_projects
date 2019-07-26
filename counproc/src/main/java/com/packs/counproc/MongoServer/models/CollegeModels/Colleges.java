@@ -6,6 +6,8 @@ import lombok.ToString;
 import org.springframework.data.annotation.Id;
 
 import javax.persistence.Column;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 
 @Getter

@@ -1,5 +1,8 @@
 package com.packs.counproc.MongoServer.models.AssessmentModels;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import org.json.simple.JSONObject;
 import org.springframework.data.annotation.Id;
 

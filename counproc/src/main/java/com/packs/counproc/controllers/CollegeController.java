@@ -85,4 +85,6 @@ public class CollegeController {
 // 2 database - DONE
 // assessments - DONE
 // assign classes based on marks - 2 students > 80, 2 > 70- DONE
-// corner cases
+// corner cases - DONE
+// optimise assign classes
+// calculate marks for assessments

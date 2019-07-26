@@ -4,14 +4,12 @@ package com.packs.counproc.utils;
 import com.packs.counproc.MongoServer.models.DatabaseSequence;
 import com.packs.counproc.MongoServer.models.requests.ChooseCollege;
 import com.packs.counproc.MongoServer.repositories.DatabaseSequenceRepo;
-import com.packs.counproc.MongoServer.repositories.register.RegisterStudentRepo;
 import com.packs.counproc.MysqlServer.models.RegisterStudent;
 import com.packs.counproc.MysqlServer.repositories.StudentRegRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -19,9 +17,6 @@ public class Utils {
 
     @Autowired
     private MongoOperations mongo;
-
-    @Autowired
-    RegisterStudentRepo registerStudentRepo;
 
     @Autowired
     StudentRegRepository studentRegRepository;

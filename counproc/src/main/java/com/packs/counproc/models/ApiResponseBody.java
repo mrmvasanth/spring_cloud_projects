@@ -19,8 +19,11 @@ public class ApiResponseBody<T> {
     private String message;
 
     private T data;
+    public ApiResponseBody(T data,HttpStatus status) {
+        this.data = data;
+        this.httpStatus = status;
 
-
+    }
     public ApiResponseBody(T data,String message) {
         this.data = data;
         this.httpStatus=HttpStatus.OK;

@@ -8,28 +8,22 @@ import com.packs.counproc.MongoServer.models.responses.ApiResponse;
 import com.packs.counproc.MongoServer.models.responses.AvailableColleges;
 import com.packs.counproc.MongoServer.repositories.college.CollegesRepo;
 import com.packs.counproc.MongoServer.repositories.college.DepartmentListRepo;
-import com.packs.counproc.MongoServer.repositories.register.RegisterStudentRepo;
 import com.packs.counproc.MongoServer.repositories.register.StudentCollegeRepo;
 import com.packs.counproc.MysqlServer.models.RegisterStudent;
 import com.packs.counproc.MysqlServer.repositories.StudentRegRepository;
 import com.packs.counproc.models.ApiResponseBody;
 import com.packs.counproc.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class RegisterServices {
-
-    @Autowired
-    RegisterStudentRepo registerStudentRepo;
 
     @Autowired
     StudentRegRepository studentRegRepository;
